@@ -10,7 +10,7 @@ defaults:
 
 jobs:
   terraform-validate:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       # Checkout to current repository
       - name: Checkout
@@ -34,13 +34,13 @@ jobs:
         run: terraform init
   terraform-plan:
     needs: terraform-validate
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: terraform-plan
         run: terraform plan -out -input=false
   terraform-apply:
       needs: [terraform-validate, terraform-plan]
-      runs-on: self-hosted
+      runs-on: ubuntu-latest
       environment:
         name: Terraform-apply
       steps:
