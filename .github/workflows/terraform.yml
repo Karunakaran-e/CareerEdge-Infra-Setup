@@ -18,7 +18,7 @@ jobs:
     name: deploy
     runs-on: self-hosted
     needs: terraform-plan
-    permissions: read-all
+    permissions: write-all
     steps:
       - uses: trstringer/manual-approval@v1
         with:
