@@ -16,9 +16,9 @@ jobs:
           echo "Terraform plan completed"
   deploy:
     name: deploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: terraform-plan
-    permissions: write-all
+    permissions: read-all
     steps:
       - uses: trstringer/manual-approval@v1
         with:
