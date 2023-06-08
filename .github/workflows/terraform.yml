@@ -17,6 +17,8 @@ jobs:
   terraform-apply:
     needs: [terraform-validate, terraform-plan]
     runs-on: self-hosted
+    permissions:
+      issues: write
     steps:
         - uses: trstringer/manual-approval@v1
           with:
