@@ -14,19 +14,16 @@ jobs:
       - name: terraform-plan
         run: |
           echo "Terraform plan completed"
-  deploy:
-    name: deploy
-    runs-on: self-hosted
-    needs: terraform-plan
-    permissions: write-all
-    steps:
-      - uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
-          approvers: karunakaran-e, phaneendra-reddy
-          minimum-approvals: 1
-      - name: Deploy to production
-        run: echo deploying
+  terraform-apply:
+      needs: [terraform-validate, terraform-plan]
+      runs-on: self-hosted
+      environment:
+        name: Terraform-apply
+      steps:
+        - name: terraform-apply
+          run: echo "Terraform apply completed"
+
+    
   # terraform-apply:
   #   needs: [terraform-validate, terraform-plan]
   #   runs-on: self-hosted
@@ -35,7 +32,7 @@ jobs:
   #   steps:
   #       - uses: trstringer/manual-approval@v1
   #         with:
-  #           secret: ${{ github.TOKEN }
+  #           secret: ${{ github.TOKEN }}
   #           approvers: karunakaran-e
   #           minimum-approvals: 1
   #           issue-title: "Apply terraform changes"
