@@ -1,19 +1,42 @@
 name: Terraform
 on: push
+env:
+  AWS_REGION: us-east-2    
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+
 jobs:
   terraform-validate:
     runs-on: self-hosted
     steps:
-      - name: terraform-validate
-        run: |
-          echo "Terraform validate completed"
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TERRAFORMAPI }}
+          terraform_wrapper: false
+
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform init
   terraform-plan:
     needs: terraform-validate
     runs-on: self-hosted
     steps:
       - name: terraform-plan
-        run: |
-          echo "Terraform plan completed"
+        run: terraform plan -out -input=false
   terraform-apply:
       needs: [terraform-validate, terraform-plan]
       runs-on: self-hosted
@@ -21,24 +44,4 @@ jobs:
         name: Terraform-apply
       steps:
         - name: terraform-apply
-          run: echo "Terraform apply completed"
-
-    
-  # terraform-apply:
-  #   needs: [terraform-validate, terraform-plan]
-  #   runs-on: self-hosted
-  #   permissions:
-  #     issues: write
-  #   steps:
-  #       - uses: trstringer/manual-approval@v1
-  #         with:
-  #           secret: ${{ github.TOKEN }}
-  #           approvers: karunakaran-e
-  #           minimum-approvals: 1
-  #           issue-title: "Apply terraform changes"
-  #           issue-body: "Please approve or deny the new terraform changes."
-  #           exclude-workflow-initiator-as-approver: false
-  #           additional-approved-words: ''
-  #           additional-denied-words: ''
-  #           run: |
-  #               echo "Terraform apply completed"
+          run: terraform destroy "-input=false" --auto-approve
