@@ -71,4 +71,4 @@ jobs:
           run: |
             terraform init -backend=false
             terraform validate
-            terraform destroy "-input=false" --auto-approve
+            terraform apply "-input=false" --auto-approve
