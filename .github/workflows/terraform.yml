@@ -37,7 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: terraform-plan
-        run: terraform plan -out -input=false
+        run: |
+          echo $(pwd)
+          echo $(ls -la)
+          terraform plan -out -input=false
   terraform-apply:
       needs: [terraform-validate, terraform-plan]
       runs-on: ubuntu-latest
