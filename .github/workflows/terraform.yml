@@ -47,8 +47,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - name: terraform-plan
         run: |
-          echo $(pwd)
-          echo $(ls -la)
+          terraform init
           terraform plan -out -input=false
   terraform-apply:
       needs: [terraform-validate, terraform-plan]
@@ -66,4 +65,6 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ env.AWS_REGION }}
         - name: terraform-apply
-          run: terraform destroy "-input=false" --auto-approve
+          run: |
+            terraform init
+            terraform apply "-input=false" --auto-approve
