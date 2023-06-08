@@ -14,21 +14,32 @@ jobs:
       - name: terraform-plan
         run: |
           echo "Terraform plan completed"
-  terraform-apply:
-    needs: [terraform-validate, terraform-plan]
-    runs-on: self-hosted
-    permissions:
-      issues: write
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    needs: terraform-plan
     steps:
-        - uses: trstringer/manual-approval@v1
-          with:
-            secret: ${{ github.TOKEN }}
-            approvers: karunakaran-e
-            minimum-approvals: 1
-            issue-title: "Apply terraform changes"
-            issue-body: "Please approve or deny the new terraform changes."
-            exclude-workflow-initiator-as-approver: false
-            additional-approved-words: ''
-            additional-denied-words: ''
-            run: |
-                echo "Terraform apply completed"
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: karunakaran-e, phaneendra-reddy
+      - name: Deploy to production
+        run: echo deploying
+  # terraform-apply:
+  #   needs: [terraform-validate, terraform-plan]
+  #   runs-on: self-hosted
+  #   permissions:
+  #     issues: write
+  #   steps:
+  #       - uses: trstringer/manual-approval@v1
+  #         with:
+  #           secret: ${{ github.TOKEN }}
+  #           approvers: karunakaran-e
+  #           minimum-approvals: 1
+  #           issue-title: "Apply terraform changes"
+  #           issue-body: "Please approve or deny the new terraform changes."
+  #           exclude-workflow-initiator-as-approver: false
+  #           additional-approved-words: ''
+  #           additional-denied-words: ''
+  #           run: |
+  #               echo "Terraform apply completed"
