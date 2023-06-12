@@ -44,7 +44,7 @@ jobs:
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
         run: |
-          terraform init -backend=false
+          terraform init
           terraform validate
   terraform-plan:
     needs: terraform-validate
@@ -61,7 +61,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - name: terraform-plan
         run: |
-          terraform init -backend=false
+          terraform init
           terraform validate
           terraform plan -out -input=false
   terraform-apply:
@@ -82,7 +82,7 @@ jobs:
             aws-region: ${{ env.AWS_REGION }}
         - name: terraform-apply
           run: |
-            terraform init -backend=false
+            terraform init
             terraform validate
             # terraform apply "-input=false" --auto-approve
             echo "Apply completed successfully..."
