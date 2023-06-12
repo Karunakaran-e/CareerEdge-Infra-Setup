@@ -73,6 +73,10 @@ variable "vpc_single_nat_gateway" {
   default     = true
 }
 
+variable "aws_region" {}
+variable "environment" {}
+variable "business_divsion" {}
+variable "cluster_name" {}
 
 
 

@@ -53,3 +53,21 @@ module "vpc" {
   # Instances launched into the Public subnet should be assigned a public IP address.
   map_public_ip_on_launch = true
 }
+
+resource "aws_default_security_group" "career-stag-eks-state-1" {
+  vpc_id = module.vpc.vpc_id
+
+  ingress {
+    protocol  = -1
+    self      = true
+    from_port = 0
+    to_port   = 0
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
