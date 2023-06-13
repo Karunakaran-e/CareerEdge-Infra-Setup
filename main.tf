@@ -71,3 +71,72 @@ resource "aws_default_security_group" "career-stag-eks-state-1" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+# Create AWS EKS Cluster
+resource "aws_eks_cluster" "eks_cluster" {
+  name     = "${local.name}-${var.cluster_name}"
+  role_arn = aws_iam_role.eks_master_role.arn
+  version = var.cluster_version
+
+  vpc_config {
+    endpoint_private_access = false
+    endpoint_public_access = true
+  
+
+    subnet_ids = [
+      module.vpc.vpc_id.private_subnets_id[0],
+      module.vpc.vpc_id.private_subnets_id[1]
+    ]
+  }
+  
+  # Enable EKS Cluster Control Plane Logging
+  enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
+  # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
+  # Otherwise, EKS will not be able to properly delete EKS managed EC2 infrastructure such as Security Groups.
+  depends_on = [
+    aws_iam_role_policy_attachment.eks-AmazonEKSClusterPolicy,
+    aws_iam_role_policy_attachment.eks-AmazonEKSVPCResourceController,
+  ]
+}
+
+
+# Create AWS EKS Node Group - Private
+
+resource "aws_eks_node_group" "eks_ng_private" {
+  cluster_name    = aws_eks_cluster.eks_cluster.name
+
+  node_group_name = "${local.name}-eks-ng-private"
+  node_role_arn   = aws_iam_role.eks_nodegroup_role.arn
+  subnet_ids      = [
+    module.vpc.vpc_id.private_subnets_id[0],
+    module.vpc.vpc_id.private_subnets_id[1]
+
+  ]
+  version = var.cluster_version #(Optional: Defaults to EKS Cluster Kubernetes version)    
+  
+  ami_type = "AL2_x86_64"  
+  capacity_type = "ON_DEMAND"
+  disk_size = 30
+  instance_types = ["t3.medium"]
+  
+  
+
+  scaling_config {
+    desired_size = 2
+    min_size     = 1  
+    max_size     = 4
+  }
+
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks-AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.eks-AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.eks-AmazonEC2ContainerRegistryReadOnly,
+  ]  
+  tags = {
+    Name = "Private-Node-Group"
+  }
+}
+
+
