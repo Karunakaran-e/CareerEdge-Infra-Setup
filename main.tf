@@ -76,16 +76,16 @@ resource "aws_default_security_group" "career-stag-eks-state-1" {
 resource "aws_eks_cluster" "eks_cluster" {
   name     = "${local.name}-${var.cluster_name}"
   role_arn = aws_iam_role.eks_master_role.arn
-  version = var.cluster_version
+  version  = var.cluster_version
 
   vpc_config {
     endpoint_private_access = false
-    endpoint_public_access = true
-  
+    endpoint_public_access  = true
+
 
     subnet_ids = module.vpc.private_subnets
   }
-  
+
   # Enable EKS Cluster Control Plane Logging
   enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
@@ -101,24 +101,24 @@ resource "aws_eks_cluster" "eks_cluster" {
 # Create AWS EKS Node Group - Private
 
 resource "aws_eks_node_group" "eks_ng_private" {
-  cluster_name    = aws_eks_cluster.eks_cluster.name
+  cluster_name = aws_eks_cluster.eks_cluster.name
 
   node_group_name = "${local.name}-eks-ng-private"
   node_role_arn   = aws_iam_role.eks_nodegroup_role.arn
   subnet_ids      = module.vpc.private_subnets
-  version = var.cluster_version #(Optional: Defaults to EKS Cluster Kubernetes version)    
-  
-  ami_type = "AL2_x86_64"  
-  capacity_type = "ON_DEMAND"
-  disk_size = 30
+  version         = var.cluster_version #(Optional: Defaults to EKS Cluster Kubernetes version)    
+
+  ami_type       = "AL2_x86_64"
+  capacity_type  = "ON_DEMAND"
+  disk_size      = 30
   instance_types = ["t3.medium"]
-  
-  
+
+
 
   scaling_config {
-    desired_size = 2
-    min_size     = 1  
-    max_size     = 4
+    desired_size = 0
+    min_size     = 0
+    max_size     = 1
   }
 
 
@@ -126,10 +126,16 @@ resource "aws_eks_node_group" "eks_ng_private" {
     aws_iam_role_policy_attachment.eks-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.eks-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.eks-AmazonEC2ContainerRegistryReadOnly,
-  ]  
+  ]
   tags = {
     Name = "Private-Node-Group"
   }
 }
+
+
+
+
+
+
 
 
