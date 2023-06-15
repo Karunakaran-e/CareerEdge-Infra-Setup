@@ -1,9 +1,8 @@
 name: Terraform
 on:
-  push:
-    branches:
-      - 'feature/**'
-      - 'release/**'
+  on:
+  repository_dispatch:
+    types: api-trigger
     paths-ignore:
       - README.md
       - .gitignore
@@ -13,7 +12,7 @@ on:
     branches:
       - 'main'
 env:
-  AWS_REGION: us-east-2 
+  environment: stag 
 permissions:
   contents: read
 defaults:
