@@ -85,4 +85,4 @@ jobs:
             terraform init
             terraform validate
             terraform apply "-input=false" --auto-approve
-            echo "Apply completed successfully..."
+            echo "Apply completed successfully..." 
